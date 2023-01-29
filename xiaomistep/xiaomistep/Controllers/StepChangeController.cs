@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using System.Runtime.Intrinsics.X86;
 using System.Security.Principal;
 using xiaomistep.HelperFiles;
 
@@ -31,14 +32,20 @@ namespace xiaomistep.Controllers
             return "执行失败";
         }
         [HttpPost("AddAccountAuto")]
-        public string AddAccountAuto([FromForm] string acc, [FromForm] string pwd, [FromForm] string step)
+        public async Task<string> AddAccountAuto([FromForm] string acc, [FromForm] string pwd, [FromForm] string step)
         {
             if(int.TryParse(step,out int ste))
             {
-                AutoHelper.GetInstence().AddAcc(acc, pwd, ste);
-                return "添加成功";
+                return await AutoHelper.GetInstence().AddAcc(acc, pwd, ste);
             }
             return "添加失败";
         }
+
+        [HttpPost("DelAccountAuto")]
+        public string DelAccountAuto([FromForm] string acc)
+        {
+            return AutoHelper.GetInstence().DelAcc(acc);
+        }
     }
+    
 }
