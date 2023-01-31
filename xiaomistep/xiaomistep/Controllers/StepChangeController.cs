@@ -18,14 +18,15 @@ namespace xiaomistep.Controllers
             {
                 return "步数错误";
             }
-            if (!SingleTon.GetInstance().AddRecord(acc, ste))
+            if (!SingleTon.GetInstance().CheckRecord(acc, ste))
             {
-                //return "步数必须大于上一次";
+                return "步数必须大于上一次";
             }
             var result = await helper.Start(acc, pwd, ste);
             if (result)
             {
                 LogsHelper.Info("账号:" + acc + "执行成功");
+                SingleTon.GetInstance().AddRecord(acc, ste);
                 return "执行成功";
             }
             LogsHelper.Error("账号:" + acc + "执行失败");

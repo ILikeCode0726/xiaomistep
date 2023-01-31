@@ -61,12 +61,12 @@ namespace xiaomistep.HelperFiles
             return instence;
         }
         /// <summary>
-        /// 添加当天的记录
+        /// 检查当天记录
         /// </summary>
         /// <param name="acc"></param>
         /// <param name="step"></param>
         /// <returns></returns>
-        public bool AddRecord(string acc,int step)
+        public bool CheckRecord(string acc, int step)
         {
             if (string.IsNullOrEmpty(acc))
             {
@@ -93,8 +93,27 @@ namespace xiaomistep.HelperFiles
             time = DateTime.Parse(time.ToString("D"));
             if (records.Where(m => m.Item1 == acc && m.Item2 >= step && m.Item3 == time).Count() > 0)
                 return false;
-            records.Add((acc,step, time));
+
             return true;
+        }
+        /// <summary>
+        /// 添加当天的记录
+        /// </summary>
+        /// <param name="acc"></param>
+        /// <param name="step"></param>
+        /// <returns></returns>
+        public void AddRecord(string acc,int step)
+        {
+            DateTime time = DateTime.Now;
+            if (Environment.OSVersion.Platform == PlatformID.Win32NT)
+            {
+                time = DateTime.Now;
+            }
+            else if (Environment.OSVersion.Platform == PlatformID.Unix)
+            {
+                time = DateTime.Now.AddHours(8);
+            }
+            records.Add((acc,step, time));
         }
     }
 }
