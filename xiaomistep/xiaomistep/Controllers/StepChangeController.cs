@@ -20,7 +20,7 @@ namespace xiaomistep.Controllers
             }
             if (!SingleTon.GetInstance().AddRecord(acc, ste))
             {
-                return "步数必须大于上一次";
+                //return "步数必须大于上一次";
             }
             var result = await helper.Start(acc, pwd, ste);
             if (result)
@@ -45,6 +45,16 @@ namespace xiaomistep.Controllers
         public string DelAccountAuto([FromForm] string acc)
         {
             return AutoHelper.GetInstence().DelAcc(acc);
+        }
+        [HttpGet("GetAllAccountAuto")]
+        public string GetAllAccountAuto()
+        {
+            string result = string.Empty;
+            foreach (var item in AutoHelper.GetInstence().GetAllAcc())
+            {
+                result += item + "\n";
+            }
+             return result;
         }
     }
     

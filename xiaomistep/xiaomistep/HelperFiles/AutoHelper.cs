@@ -50,7 +50,7 @@ namespace xiaomistep.HelperFiles
                             var result = await new ChangeStepHelper().Start(item.Account, item.Password, item.Step ?? 18001);
                             if (result)
                             {
-                                LogsHelper.Info("账号:" + item.Account + "执行成功");
+                                LogsHelper.Info("账号:" + item.Account + "自动执行成功");
                             }
                         }
                     }
@@ -96,14 +96,14 @@ namespace xiaomistep.HelperFiles
                 accountModel.Step = step;
                 System.IO.File.WriteAllText(filePath, JsonConvert.SerializeObject(accountModels));
                 LogsHelper.Info("账号:" + acc + "步数更新成功");
-                return "账号:" + acc + " 步数更新成功";
+                return "账号:" + acc + "步数更新成功";
             }
             if (SingleTon.GetInstance().AddRecord(acc, step))
             {
                 var result = await new ChangeStepHelper().Start(acc, pwd, step);
                 if (result)
                 {
-                    LogsHelper.Info("账号:" + acc + "执行成功");
+                    LogsHelper.Info("账号:" + acc + "步数修改执行成功");
                 }
             }
             accountModels.Add(new AccountModel() { Account = acc, Password = pwd, Step = step });
@@ -128,6 +128,11 @@ namespace xiaomistep.HelperFiles
             }
             LogsHelper.Error("账号:" + acc + "删除失败，无此账号");
             return "账号:" + acc + "删除失败，无此账号";
+        }
+
+        public IList<string> GetAllAcc()
+        {
+            return accountModels.Select(m => m.Account??string.Empty).ToList();
         }
     }
 }

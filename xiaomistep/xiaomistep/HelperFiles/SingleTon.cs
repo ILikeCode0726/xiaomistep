@@ -85,8 +85,13 @@ namespace xiaomistep.HelperFiles
             {
                 time = DateTime.Now.AddHours(8);
             }
+            //六点钟之前不执行
+            if (time.Hour < 6)
+            {
+                return false;
+            }
             time = DateTime.Parse(time.ToString("D"));
-            if (records.Where(m => m.Item1 == acc && m.Item2 > step && m.Item3 == time).Count() > 0)
+            if (records.Where(m => m.Item1 == acc && m.Item2 >= step && m.Item3 == time).Count() > 0)
                 return false;
             records.Add((acc,step, time));
             return true;

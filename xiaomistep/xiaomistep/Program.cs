@@ -19,4 +19,12 @@ app.UseAuthorization();
 
 app.MapControllers();
 
+#region 配置HTML静态页面为启动页面   删除 launchSettings.json 的 launchUrl
+DefaultFilesOptions defaultFilesOptions = new DefaultFilesOptions();
+defaultFilesOptions.DefaultFileNames.Clear();
+defaultFilesOptions.DefaultFileNames.Add("Index.html");
+app.UseDefaultFiles(defaultFilesOptions);
+app.UseStaticFiles();
+#endregion
+
 app.Run();
