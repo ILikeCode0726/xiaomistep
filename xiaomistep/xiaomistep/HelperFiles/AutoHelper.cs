@@ -45,17 +45,16 @@ namespace xiaomistep.HelperFiles
                     {
                         if (item.Account == null || item.Step == null || item.Password == null)
                             continue;
-                        if (SingleTon.GetInstance().CheckRecord(item.Account, item.Step ?? 18001))
+                        if (RecordHelper.GetInstence().CheckRecord(item.Account, item.Step ?? 18001))
                         {
                             var result = await new ChangeStepHelper().Start(item.Account, item.Password, item.Step ?? 18001);
                             if (result)
                             {
                                 LogsHelper.Info("账号:" + item.Account + "自动执行成功");
-                                SingleTon.GetInstance().AddRecord(item.Account, item.Step ?? 18001);
                             }
                         }
                     }
-                    await Task.Delay(new TimeSpan(1, 0, 0));
+                    await Task.Delay(new TimeSpan(0, 0, 1));
                 }
             });
         }
@@ -99,12 +98,11 @@ namespace xiaomistep.HelperFiles
                 LogsHelper.Info("账号:" + acc + "步数更新成功");
                 return "账号:" + acc + "步数更新成功";
             }
-            if (SingleTon.GetInstance().CheckRecord(acc, step))
+            if (RecordHelper.GetInstence().CheckRecord(acc, step))
             {
                 var result = await new ChangeStepHelper().Start(acc, pwd, step);
                 if (result)
                 {
-                    SingleTon.GetInstance().AddRecord(acc, step);
                     LogsHelper.Info("账号:" + acc + "步数修改执行成功");
                 }
             }

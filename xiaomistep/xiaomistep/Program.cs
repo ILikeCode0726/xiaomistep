@@ -2,7 +2,7 @@ using xiaomistep.HelperFiles;
 
 LogsHelper.Init();
 AutoHelper.GetInstence().Init();
-SingleTon.GetInstance().Init();
+RecordHelper.GetInstence().Init();
 
 
 var builder = WebApplication.CreateBuilder(args);

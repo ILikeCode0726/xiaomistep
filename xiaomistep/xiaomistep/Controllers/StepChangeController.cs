@@ -14,11 +14,15 @@ namespace xiaomistep.Controllers
         [HttpPost("Change")]
         public async Task<string> Change([FromForm]string acc, [FromForm] string pwd, [FromForm] string step)
         {
-            if(!int.TryParse(step,out int ste))
+            if (string.IsNullOrEmpty(acc))
+                return "账号不能为空";
+            if (string.IsNullOrEmpty(pwd))
+                return "密码不能为空";
+            if (!int.TryParse(step,out int ste))
             {
                 return "步数错误";
             }
-            if (!SingleTon.GetInstance().CheckRecord(acc, ste))
+            if (!RecordHelper.GetInstence().CheckRecord(acc, ste))
             {
                 return "步数必须大于上一次";
             }
@@ -26,7 +30,6 @@ namespace xiaomistep.Controllers
             if (result)
             {
                 LogsHelper.Info("账号:" + acc + "执行成功");
-                SingleTon.GetInstance().AddRecord(acc, ste);
                 return "执行成功";
             }
             LogsHelper.Error("账号:" + acc + "执行失败");
@@ -35,16 +38,24 @@ namespace xiaomistep.Controllers
         [HttpPost("AddAccountAuto")]
         public async Task<string> AddAccountAuto([FromForm] string acc, [FromForm] string pwd, [FromForm] string step)
         {
-            if(int.TryParse(step,out int ste))
+            if (string.IsNullOrEmpty(acc))
+                return "账号不能为空";
+            if (string.IsNullOrEmpty(pwd))
+                return "密码不能为空";
+            if (string.IsNullOrEmpty(step))
+                return "步数不能为空";
+            if (int.TryParse(step,out int ste))
             {
                 return await AutoHelper.GetInstence().AddAcc(acc, pwd, ste);
             }
-            return "添加失败";
+            return "添加失败，步数只能为整数";
         }
 
         [HttpPost("DelAccountAuto")]
         public string DelAccountAuto([FromForm] string acc)
         {
+            if (string.IsNullOrEmpty(acc))
+                return "账号不能为空";
             return AutoHelper.GetInstence().DelAcc(acc);
         }
         [HttpGet("GetAllAccountAuto")]
