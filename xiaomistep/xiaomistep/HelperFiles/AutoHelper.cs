@@ -25,6 +25,27 @@ namespace xiaomistep.HelperFiles
         {
 
         }
+
+        private async void Do()
+        {
+            for (int i = 0; i < accountModels.Count; i++)
+            {
+                if (accountModels[i].Account == null || accountModels[i].Step == null || accountModels[i].Password == null)
+                    continue;
+                if (RecordHelper.GetInstence().CheckRecord(accountModels[i].Account, accountModels[i].Step ?? 18001))
+                {
+                    var result = await new ChangeStepHelper().Start(accountModels[i].Account, accountModels[i].Password, accountModels[i].Step ?? 18001);
+                    if (result)
+                    {
+                        LogsHelper.Info("账号:" + accountModels[i].Account + "自动执行成功");
+                    }
+                    else
+                    {
+                        LogsHelper.Error("账号:" + accountModels[i].Account + "自动执行失败");
+                    }
+                }
+            }
+        }
         /// <summary>
         /// 初始化
         /// </summary>
@@ -41,20 +62,8 @@ namespace xiaomistep.HelperFiles
             {
                 while (true)
                 {
-                    foreach (var item in accountModels)
-                    {
-                        if (item.Account == null || item.Step == null || item.Password == null)
-                            continue;
-                        if (RecordHelper.GetInstence().CheckRecord(item.Account, item.Step ?? 18001))
-                        {
-                            var result = await new ChangeStepHelper().Start(item.Account, item.Password, item.Step ?? 18001);
-                            if (result)
-                            {
-                                LogsHelper.Info("账号:" + item.Account + "自动执行成功");
-                            }
-                        }
-                    }
-                    await Task.Delay(new TimeSpan(0, 0, 1));
+                    Do();
+                    await Task.Delay(new TimeSpan(0, 30, 0));
                 }
             });
         }
@@ -83,7 +92,7 @@ namespace xiaomistep.HelperFiles
         /// <param name="pwd"></param>
         /// <param name="step"></param>
         /// <returns></returns>
-        public async Task<string> AddAcc(string acc, string pwd, int step)
+        public string AddAcc(string acc, string pwd, int step)
         {
             var accountModel = accountModels.FirstOrDefault(m => m.Account == acc);
             if (accountModel != null && accountModel.Step >= step)
@@ -98,14 +107,7 @@ namespace xiaomistep.HelperFiles
                 LogsHelper.Info("账号:" + acc + "步数更新成功");
                 return "账号:" + acc + "步数更新成功";
             }
-            if (RecordHelper.GetInstence().CheckRecord(acc, step))
-            {
-                var result = await new ChangeStepHelper().Start(acc, pwd, step);
-                if (result)
-                {
-                    LogsHelper.Info("账号:" + acc + "步数修改执行成功");
-                }
-            }
+            Do();
             accountModels.Add(new AccountModel() { Account = acc, Password = pwd, Step = step });
             LogsHelper.Info("账号:" + acc + "添加成功");
             System.IO.File.WriteAllText(filePath, JsonConvert.SerializeObject(accountModels));

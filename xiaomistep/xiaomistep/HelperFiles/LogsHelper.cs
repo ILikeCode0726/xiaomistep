@@ -81,17 +81,9 @@ namespace xiaomistep.HelperFiles
         /// <returns></returns>
         public static IList<LogModel> GetTodayLog()
         {
-            DateTime time = DateTime.Now;
-            if (Environment.OSVersion.Platform == PlatformID.Win32NT)
-            {
-                time = DateTime.Now;
-            }
-            else if (Environment.OSVersion.Platform == PlatformID.Unix)
-            {
-                time = DateTime.Now.AddHours(8);
-            }
+            DateTime time = TimeHelper.DateNow.AddDays(-1);
             time = DateTime.Parse(time.ToString("D")).AddDays(-1);
-            return logs.Where(m=>m.Time!=null&&m.Time> time).ToList();
+            return logs.Where(m=>m.Time!=null&&m.Time.Value.ToUniversalTime().Ticks > time.ToUniversalTime().Ticks).ToList();
         }
         /// <summary>
         /// 查询今天的错误日志
@@ -99,17 +91,8 @@ namespace xiaomistep.HelperFiles
         /// <returns></returns>
         public static IList<LogModel> GetTodayErrorLog()
         {
-            DateTime time = DateTime.Now;
-            if (Environment.OSVersion.Platform == PlatformID.Win32NT)
-            {
-                time = DateTime.Now;
-            }
-            else if (Environment.OSVersion.Platform == PlatformID.Unix)
-            {
-                time = DateTime.Now.AddHours(8);
-            }
-            time = DateTime.Parse(time.ToString("D")).AddDays(-1);
-            return logs.Where(m => m.Time != null && m.Time > time&&m.Level==Level.Error).ToList();
+            DateTime time = TimeHelper.DateNow.AddDays(-1);
+            return logs.Where(m => m.Time != null && m.Time.Value.ToUniversalTime().Ticks > time.ToUniversalTime().Ticks && m.Level==Level.Error).ToList();
         }
     }
 }

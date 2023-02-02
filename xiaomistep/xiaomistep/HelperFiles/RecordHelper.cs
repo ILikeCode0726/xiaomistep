@@ -17,34 +17,7 @@ namespace xiaomistep.HelperFiles
         {
 
         }
-        /// <summary>
-        /// 添加一条记录
-        /// </summary>
-        /// <param name="acc">账号</param>
-        /// <param name="step">步数</param>
-        public void AddRecord(string acc,int step)
-        {
-            DateTime time = DateTime.Now;
-            if (Environment.OSVersion.Platform == PlatformID.Win32NT)
-            {
-                time = DateTime.Now;
-            }
-            else if (Environment.OSVersion.Platform == PlatformID.Unix)
-            {
-                time = DateTime.Now.AddHours(8);
-            }
 
-            var firstR = records.Where(m => m.Account == acc).MaxBy(m => m.Time);//最新的记录
-            if (firstR == null)
-            {
-                records.Add(new AccountModel() { Account= acc,Step=step,Time=time });
-            }
-            else
-            {
-                firstR.Time = time;
-            }
-            File.WriteAllText(filePath, JsonConvert.SerializeObject(records));
-        }
 
         /// <summary>
         /// 初始化
@@ -74,26 +47,12 @@ namespace xiaomistep.HelperFiles
                 {
                     await Task.Delay(new TimeSpan(1, 0, 0));
 
-
-                    DateTime time = DateTime.Now;
-                    if (Environment.OSVersion.Platform == PlatformID.Win32NT)
-                    {
-                        time = DateTime.Now;
-                    }
-                    else if (Environment.OSVersion.Platform == PlatformID.Unix)
-                    {
-                        time = DateTime.Now.AddHours(8);
-                    }
-
                     List<AccountModel> rTemp=new List<AccountModel>();
                     foreach (var item in records)
                     {
                         if (item.Time.HasValue)
                         {
-                            System.DateTime startTime = TimeZone.CurrentTimeZone.ToLocalTime(new System.DateTime(1970, 1, 1));//当地时区
-                            var now = Convert.ToInt64((time - startTime).TotalSeconds);
-                            var old= Convert.ToInt64((item.Time.Value-startTime).TotalSeconds);
-                            if (old + 259200 < now)
+                            if (item.Time.Value.ToUniversalTime().Ticks < TimeHelper.DateNow.ToUniversalTime().Ticks)
                             {
                                 rTemp.Add(item);
                             }
@@ -136,15 +95,7 @@ namespace xiaomistep.HelperFiles
         /// <returns></returns>
         public bool CheckRecord(string acc, int step)
         {
-            DateTime time = DateTime.Now;
-            if (Environment.OSVersion.Platform == PlatformID.Win32NT)
-            {
-                time = DateTime.Now;
-            }
-            else if (Environment.OSVersion.Platform == PlatformID.Unix)
-            {
-                time = DateTime.Now.AddHours(8);
-            }
+            DateTime time = TimeHelper.DateTimeNow;
 
             var firstR = records.Where(m => m.Account == acc).MaxBy(m => m.Time);//最新的记录
             if (firstR == null)
@@ -156,6 +107,27 @@ namespace xiaomistep.HelperFiles
                 return true;
             }
             return false;
+        }
+
+        /// <summary>
+        /// 添加一条记录
+        /// </summary>
+        /// <param name="acc">账号</param>
+        /// <param name="step">步数</param>
+        public void AddRecord(string acc, int step)
+        {
+            DateTime time = TimeHelper.DateTimeNow;
+
+            var firstR = records.Where(m => m.Account == acc).MaxBy(m => m.Time);//最新的记录
+            if (firstR == null)
+            {
+                records.Add(new AccountModel() { Account = acc, Step = step, Time = time });
+            }
+            else
+            {
+                firstR.Time = time;
+            }
+            File.WriteAllText(filePath, JsonConvert.SerializeObject(records));
         }
     }
 }
