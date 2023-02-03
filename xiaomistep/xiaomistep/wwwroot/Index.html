@@ -3,68 +3,132 @@
 
 <head>
     <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>导航</title>
-    <link href="https://unpkg.com/element-ui@2.15.12/lib/theme-chalk/index.css" rel="stylesheet" />
+    <!-- <link href="https://unpkg.com/element-ui@2.15.12/lib/theme-chalk/index.css" rel="stylesheet" /> -->
     <!-- <link href="ElementUI.css" rel="stylesheet" /> -->
+    <style>
+        .header a {
+            text-decoration: none;
+            margin: 8px;
+        }
 
+            .header a:hover {
+                border-bottom: 1.5px solid;
+            }
+
+        .col {
+            display: inline-block;
+            width: auto;
+            margin: 8px 8px;
+        }
+
+        form {
+            color: #606266;
+        }
+
+        .label {
+            display: block;
+            margin: 0 0 4px 0;
+        }
+
+        .submitBtn {
+            display: block;
+            margin-top: 8px;
+            height: 25px;
+            width: 48px;
+            border: 0;
+            font-size: 12px;
+            box-sizing: content-box;
+            border-radius: 5px;
+            color: white;
+            background-color: #459ffc;
+        }
+
+            .submitBtn:hover {
+                background-color: #69b2fd;
+                cursor: pointer;
+            }
+
+        .input {
+            margin: 2px 0px;
+            border: 1px solid #ccc;
+            padding: 4px 0px;
+            border-radius: 3px;
+            padding-left: 5px;
+            -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075);
+            box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075);
+            -webkit-transition: border-color ease-in-out .15s, -webkit-box-shadow ease-in-out .15s;
+            -o-transition: border-color ease-in-out .15s, box-shadow ease-in-out .15s;
+            transition: border-color ease-in-out .15s, box-shadow ease-in-out .15s
+        }
+
+            .input:focus {
+                border-color: #66afe9;
+                outline: 0;
+                -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075), 0 0 8px rgba(102, 175, 233, .6);
+                box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075), 0 0 8px rgba(102, 175, 233, .6)
+            }
+    </style>
 </head>
 
 <body>
     <div id="app">
-        <el-container>
-            <el-main>
-                <div>
-                    <el-link href="/api/logs/GetAllLogs" target="_blank">查看所有日志</el-link>
-                    <el-link href="/api/logs" type="primary">查看当天日志</el-link>
-                    <el-link href="/api/logs/GetTodayErrorLogs" type="success">查看当天错误日志</el-link>
-                    <el-link href="/api/StepChange/GetAllAccountAuto" type="success">查看所有账号</el-link>
-                </div>
-                <div>
-                    <form action="/api/StepChange/Change" method="post">
-                        <div>
-                            <span style="font-size: 20px;">修改</span>
-                        </div>
-                        <label for="acc">账号:</label> <input id="acc" name="acc" />
-                        <label for="pwd">密码:</label> <input id="pwd" type="password" name="pwd" />
-                        <label for="step">步数:</label> <input id="step" name="step" />
-                        <input type="submit" value="提交" />
-                    </form>
-                    <form action="/api/StepChange/AddAccountAuto" method="post">
-                        <div>
-                            <span style="font-size: 20px;">添加</span>
-                        </div>
-                        <label for="acc">账号:</label> <input id="acc" name="acc" />
-                        <label for="pwd">密码:</label> <input id="pwd" type="password" name="pwd" />
-                        <label for="step">步数:</label> <input id="step" name="step" />
-                        <input type="submit" value="添加" />
-                    </form>
-                    <form action="/api/StepChange/DelAccountAuto" method="post">
-                        <div>
-                            <span style="font-size: 20px;">删除</span>
-                        </div>
-                        <label for="acc">账号:</label> <input id="acc" name="acc" />
-                        <input type="submit" value="删除" />
-                    </form>
+        <div class="header">
+            <a href="/api/logs/GetAllLogs" style="color: #409EFF;">查看所有日志</a>
+            <a href="/api/logs" style="color: #67C23A;">查看当天日志</a>
+            <a href="/api/logs/GetTodayErrorLogs" style="color: #F56C6C;">查看当天错误日志</a>
+            <a href="/api/StepChange/GetAllAccountAuto" style="color: #67C23A;">查看所有账号</a>
 
-                </div>
-            </el-main>
-        </el-container>
+        </div>
+        <div class="main">
+            <div class="col">
+                <form action="/api/StepChange/Change" method="post">
+                    <div>
+                        <span style="font-size: 20px;">修改步数</span>
+                    </div>
+                    <label class="label" for="acc1">账号:</label> <input id="acc1" name="acc" placeholder="请输入账号"
+                                                                       class="input" />
+                    <label class="label" for="pwd1">密码:</label> <input id="pwd1" type="password" name="pwd"
+                                                                       placeholder="请输入密码" class="input" />
+                    <label class="label" for="step1">步数:</label> <input id="step1" name="step" placeholder="请输入步数"
+                                                                        class="input" />
+                    <input class="submitBtn" type="submit" value="提交" />
+                </form>
+            </div>
+            <div class="col">
+                <form action="/api/StepChange/AddAccountAuto" method="post">
+                    <div>
+                        <span style="font-size: 20px;">添加自动执行</span>
+                    </div>
+                    <label class="label" for="acc2">账号:</label> <input id="acc2" name="acc" placeholder="请输入账号"
+                                                                       class="input" />
+                    <label class="label" for="pwd2">密码:</label> <input id="pwd2" type="password" name="pwd"
+                                                                       placeholder="请输入密码" class="input" />
+                    <label class="label" for="step2">步数:</label> <input id="step2" name="step" placeholder="请输入步数"
+                                                                        class="input" />
+                    <input class="submitBtn" type="submit" value="添加" />
+                </form>
+            </div>
+            <div class="col">
+                <form action="/api/StepChange/DelAccountAuto" method="post">
+                    <div>
+                        <span style="font-size: 20px;">删除自动执行</span>
+                    </div>
+                    <label class="label" for="acc3">账号:</label> <input id="acc3" name="acc" placeholder="请输入账号"
+                                                                       class="input" />
+                    <input class="submitBtn" type="submit" value="删除" />
+                    <div style="visibility: hidden;">
+                        <label class="label">密码:</label> <input class="input" />
+                        <label class="label">步数:</label> <input class="input" />
+                    </div>
+                </form>
+            </div>
+
+        </div>
+
     </div>
-    <!-- import Vue before Element -->
-    <script src="https://cdn.jsdelivr.net/npm/vue@2/dist/vue.js"></script>
-    <!-- import JavaScript -->
-    <script src="https://unpkg.com/element-ui/lib/index.js"></script>
 
-    <!-- <script src="Vue.js"></script>
-    <script src="ElementUI.js"></script> -->
-    <script>
-        new Vue({
-            el: '#app',
-            data: function () {
-                return { visible: false }
-            }
-        })
-    </script>
 </body>
 
 </html>

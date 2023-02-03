@@ -25,12 +25,14 @@ namespace xiaomistep.HelperFiles
         {
 
         }
-
+        /// <summary>
+        /// 对自动刷步数集合中的项进行刷步数
+        /// </summary>
         private async void Do()
         {
             for (int i = 0; i < accountModels.Count; i++)
             {
-                if (accountModels[i].Account == null || accountModels[i].Step == null || accountModels[i].Password == null)
+                if (accountModels[i] == null||accountModels[i].Account == null || accountModels[i].Step == null || accountModels[i].Password == null)
                     continue;
                 if (RecordHelper.GetInstence().CheckRecord(accountModels[i].Account, accountModels[i].Step ?? 18001))
                 {
@@ -62,7 +64,11 @@ namespace xiaomistep.HelperFiles
             {
                 while (true)
                 {
-                    Do();
+                    //每天五点钟之后执行自动刷步数
+                    if (TimeHelper.DateTimeNow.Hour > 5)
+                    {
+                        Do();
+                    }
                     await Task.Delay(new TimeSpan(0, 30, 0));
                 }
             });
