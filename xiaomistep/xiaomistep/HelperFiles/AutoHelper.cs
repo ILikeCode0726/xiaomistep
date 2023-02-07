@@ -1,5 +1,6 @@
 ﻿using Newtonsoft.Json;
 using System.Runtime.Intrinsics.X86;
+using System.Security.Principal;
 using xiaomistep.Models;
 
 namespace xiaomistep.HelperFiles
@@ -98,8 +99,13 @@ namespace xiaomistep.HelperFiles
         /// <param name="pwd"></param>
         /// <param name="step"></param>
         /// <returns></returns>
-        public string AddAcc(string acc, string pwd, int step)
+        public async Task<string> AddAcc(string acc, string pwd, int step)
         {
+            bool isEmail = false;
+            if (acc.Contains("@"))
+            {
+                isEmail = true;
+            }
             var accountModel = accountModels.FirstOrDefault(m => m.Account == acc);
             if (accountModel != null && accountModel.Step >= step)
             {
@@ -113,8 +119,13 @@ namespace xiaomistep.HelperFiles
                 LogsHelper.Info("账号:" + acc + "步数更新成功");
                 return "账号:" + acc + "步数更新成功";
             }
-            Do();
+            if(string.IsNullOrEmpty(await ChangeStepHelper.LoginAndGetCode(acc, pwd, isEmail)))
+            {
+                LogsHelper.Error("账号或者密码有误，添加失败");
+                return "账号或者密码有误，添加失败";
+            }
             accountModels.Add(new AccountModel() { Account = acc, Password = pwd, Step = step });
+            Do();
             LogsHelper.Info("账号:" + acc + "添加成功");
             System.IO.File.WriteAllText(filePath, JsonConvert.SerializeObject(accountModels));
             return "账号:" + acc + "添加成功";
@@ -124,11 +135,15 @@ namespace xiaomistep.HelperFiles
         /// </summary>
         /// <param name="acc"></param>
         /// <returns></returns>
-        public string DelAcc(string acc)
+        public string DelAcc(string acc,string pwd)
         {
             var accountModel = accountModels.FirstOrDefault(m => m.Account == acc);
             if(accountModel != null)
             {
+                if (accountModel.Password != pwd)
+                {
+                    return "账号:" + acc + "删除失败,密码错误";
+                }
                 accountModels.Remove(accountModel);
                 System.IO.File.WriteAllText(filePath, JsonConvert.SerializeObject(accountModels));
                 LogsHelper.Info("账号:" + acc + "删除成功");

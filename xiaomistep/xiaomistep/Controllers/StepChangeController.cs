@@ -36,7 +36,7 @@ namespace xiaomistep.Controllers
             return "执行失败";
         }
         [HttpPost("AddAccountAuto")]
-        public string AddAccountAuto([FromForm] string acc, [FromForm] string pwd, [FromForm] string step)
+        public async Task<string> AddAccountAuto([FromForm] string acc, [FromForm] string pwd, [FromForm] string step)
         {
             if (string.IsNullOrEmpty(acc))
                 return "账号不能为空";
@@ -46,17 +46,19 @@ namespace xiaomistep.Controllers
                 return "步数不能为空";
             if (int.TryParse(step,out int ste))
             {
-                return AutoHelper.GetInstence().AddAcc(acc, pwd, ste);
+                return await AutoHelper.GetInstence().AddAcc(acc, pwd, ste);
             }
             return "添加失败，步数只能为整数";
         }
 
         [HttpPost("DelAccountAuto")]
-        public string DelAccountAuto([FromForm] string acc)
+        public string DelAccountAuto([FromForm] string acc, [FromForm] string pwd)
         {
             if (string.IsNullOrEmpty(acc))
                 return "账号不能为空";
-            return AutoHelper.GetInstence().DelAcc(acc);
+            if (string.IsNullOrEmpty(pwd))
+                return "密码不能为空";
+            return AutoHelper.GetInstence().DelAcc(acc,pwd);
         }
         [HttpGet("GetAllAccountAuto")]
         public string GetAllAccountAuto()

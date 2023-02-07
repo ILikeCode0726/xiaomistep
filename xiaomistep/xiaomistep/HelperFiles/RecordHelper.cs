@@ -40,7 +40,7 @@ namespace xiaomistep.HelperFiles
             //accountModels.Add(new AccountModel() { Account = "4", Password = "4", Step = 4, Time = DateTime.UtcNow.AddHours(11).AddSeconds(30) });
 
 
-            //清理三天前的记录，防止文件越来越大
+            //清理记录，防止文件越来越大
             Task.Run(async () =>
             {
                 while (true)
@@ -102,7 +102,7 @@ namespace xiaomistep.HelperFiles
             {
                 return true;
             }
-            if(firstR.Time.HasValue&&firstR.Time.Value.Year== time.Year&& firstR.Time.Value.Month == time.Month && firstR.Time.Value.Day == time.Day&&firstR.Step<step)
+            if(firstR.Time.HasValue&& DateTime.Equals(firstR.Time.Value.Date, time.Date)&&firstR.Step<step)
             {
                 return true;
             }
@@ -126,6 +126,7 @@ namespace xiaomistep.HelperFiles
             else
             {
                 firstR.Time = time;
+                firstR.Step = step;
             }
             File.WriteAllText(filePath, JsonConvert.SerializeObject(records));
         }

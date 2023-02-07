@@ -81,9 +81,8 @@ namespace xiaomistep.HelperFiles
         /// <returns></returns>
         public static IList<LogModel> GetTodayLog()
         {
-            DateTime time = TimeHelper.DateNow.AddDays(-1);
-            time = DateTime.Parse(time.ToString("D")).AddDays(-1);
-            return logs.Where(m=>m.Time!=null&&m.Time.Value.ToUniversalTime().Ticks > time.ToUniversalTime().Ticks).ToList();
+            DateTime time = TimeHelper.DateNow;
+            return logs.Where(m=>m.Time!=null&& DateTime.Equals(m.Time.Value.Date, time.Date)).ToList();
         }
         /// <summary>
         /// 查询今天的错误日志
@@ -91,8 +90,8 @@ namespace xiaomistep.HelperFiles
         /// <returns></returns>
         public static IList<LogModel> GetTodayErrorLog()
         {
-            DateTime time = TimeHelper.DateNow.AddDays(-1);
-            return logs.Where(m => m.Time != null && m.Time.Value.ToUniversalTime().Ticks > time.ToUniversalTime().Ticks && m.Level==Level.Error).ToList();
+            DateTime time = TimeHelper.DateNow;
+            return logs.Where(m => m.Time != null && DateTime.Equals(m.Time.Value.Date, time.Date) && m.Level==Level.Error).ToList();
         }
     }
 }
