@@ -1,40 +1,41 @@
-﻿namespace xiaomistep.HelperFiles
+﻿using System;
+
+namespace xiaomistep.HelperFiles
 {
     public static class TimeHelper
     {
+     
+        private static async Task< DateTime> GetNTP()
+        {
+            var temp= await PlayNugetPackage.TimeHelper.GetNTPTime();
+            if (temp != null)
+                return temp.Value;
+            return DateTime.UtcNow;
+        }
         /// <summary>
         /// 返回8时区的时间
         /// </summary>
-        public static DateTime DateTimeNow
+
+        public static async Task<DateTime> GetNTPPDateTimeNow()
         {
-            get
-            {
-                return DateTime.UtcNow.AddHours(8);
-            }
+            return (await GetNTP()).AddHours(8);
+        }
+        public static async Task<DateTime> GetNTPDateNow()
+        {
+            var temp = await GetNTPPDateTimeNow();
+            return DateTime.Parse(temp.ToString("D"));
         }
 
-        public static DateTime DateNow
+        public static async Task<long> Get1970ToNowSecondsAsync()
         {
-            get
-            {
-                return DateTime.Parse(DateTimeNow.ToString("D"));
-            }
+            var time =await GetNTP();
+            return (time.ToUniversalTime().Ticks - 621355968000000000) / 10000000;
         }
-
-        public static long Get1970ToNowSeconds
+        public static async Task<long> Get1970ToNowMillisecondsAsync()
         {
-            get
-            {
-                return (System.DateTime.UtcNow.ToUniversalTime().Ticks - 621355968000000000) / 10000000;
-            }
+            var time = await GetNTP();
+            return (time.ToUniversalTime().Ticks - 621355968000000000) / 10000;
         }
-
-        public static long Get1970ToNowMilliseconds
-        {
-            get
-            {
-                return (System.DateTime.UtcNow.ToUniversalTime().Ticks - 621355968000000000) / 10000;
-            }
-        }
+        
     }
 }

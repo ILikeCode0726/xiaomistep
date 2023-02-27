@@ -13,15 +13,7 @@ namespace xiaomistep.HelperFiles
 
         private static void PrintLog(string msg,Level level)
         {
-            DateTime time = DateTime.Now;
-            if (Environment.OSVersion.Platform == PlatformID.Win32NT)
-            {
-                time = DateTime.Now;
-            }
-            else if (Environment.OSVersion.Platform == PlatformID.Unix)
-            {
-                time = DateTime.Now.AddHours(8);
-            }
+            DateTime time = DateTime.UtcNow.AddHours(8);
             AddLog(new LogModel() { Level = level, Message = msg, Time = time });
         }
         private static void AddLog(LogModel log)
@@ -79,18 +71,18 @@ namespace xiaomistep.HelperFiles
         /// 查询今天的日志
         /// </summary>
         /// <returns></returns>
-        public static IList<LogModel> GetTodayLog()
+        public static async Task<IList<LogModel>> GetTodayLog()
         {
-            DateTime time = TimeHelper.DateNow;
+            DateTime time = await TimeHelper.GetNTPPDateTimeNow();
             return logs.Where(m=>m.Time!=null&& DateTime.Equals(m.Time.Value.Date, time.Date)).ToList();
         }
         /// <summary>
         /// 查询今天的错误日志
         /// </summary>
         /// <returns></returns>
-        public static IList<LogModel> GetTodayErrorLog()
+        public static async Task< IList<LogModel>> GetTodayErrorLog()
         {
-            DateTime time = TimeHelper.DateNow;
+            DateTime time =await TimeHelper.GetNTPPDateTimeNow();
             return logs.Where(m => m.Time != null && DateTime.Equals(m.Time.Value.Date, time.Date) && m.Level==Level.Error).ToList();
         }
     }

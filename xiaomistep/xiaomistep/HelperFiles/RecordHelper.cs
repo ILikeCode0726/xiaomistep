@@ -52,7 +52,7 @@ namespace xiaomistep.HelperFiles
                     {
                         if (item.Time.HasValue)
                         {
-                            if (item.Time.Value.ToUniversalTime().Ticks < TimeHelper.DateNow.ToUniversalTime().Ticks)
+                            if (item.Time.Value.ToUniversalTime().Ticks <(await TimeHelper.GetNTPDateNow()).ToUniversalTime().Ticks)
                             {
                                 rTemp.Add(item);
                             }
@@ -93,19 +93,29 @@ namespace xiaomistep.HelperFiles
         /// <param name="acc"></param>
         /// <param name="step"></param>
         /// <returns></returns>
-        public bool CheckRecord(string acc, int step)
+        public bool CheckRecord(string acc, int step,DateTime now)
         {
-            DateTime time = TimeHelper.DateTimeNow;
+            if (string.IsNullOrEmpty(acc))
+            {
+                return false;
+            }
+            //DateTime time = (await TimeHelper.GetNTPPDateTimeNow());
 
             var firstR = records.Where(m => m.Account == acc).MaxBy(m => m.Time);//最新的记录
             if (firstR == null)
             {
                 return true;
             }
-            if(firstR.Time.HasValue&& DateTime.Equals(firstR.Time.Value.Date, time.Date)&&firstR.Step<step)
+            //如果不是今天的记录
+            if(firstR.Time.HasValue && DateTime.Equals(firstR.Time.Value.Date, now.Date) == false)
             {
                 return true;
             }
+            if (firstR.Time.HasValue && DateTime.Equals(firstR.Time.Value.Date, now.Date) && firstR.Step < step)
+            {
+                return true;
+            }
+
             return false;
         }
 
@@ -114,9 +124,9 @@ namespace xiaomistep.HelperFiles
         /// </summary>
         /// <param name="acc">账号</param>
         /// <param name="step">步数</param>
-        public void AddRecord(string acc, int step)
+        public async void AddRecord(string acc, int step)
         {
-            DateTime time = TimeHelper.DateTimeNow;
+            DateTime time = (await TimeHelper.GetNTPPDateTimeNow());
 
             var firstR = records.Where(m => m.Account == acc).MaxBy(m => m.Time);//最新的记录
             if (firstR == null)

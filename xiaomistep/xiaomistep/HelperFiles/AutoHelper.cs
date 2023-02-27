@@ -29,25 +29,40 @@ namespace xiaomistep.HelperFiles
         /// <summary>
         /// 对自动刷步数集合中的项进行刷步数
         /// </summary>
-        private async void Do()
+        private async Task Do()
         {
-            for (int i = 0; i < accountModels.Count; i++)
+            DateTime now = await TimeHelper.GetNTPPDateTimeNow();
+            //每天十二点钟之后执行自动刷步数
+            if (now.Hour < 12 )
             {
-                if (accountModels[i] == null||accountModels[i].Account == null || accountModels[i].Step == null || accountModels[i].Password == null)
+                return;
+            }
+            List< AccountModel > tempModels=new List<AccountModel>(accountModels);
+            
+            while (tempModels.Count > 0)
+            {
+                var temp = tempModels[0];
+                tempModels.RemoveAt(0);
+                if (temp == null || temp.Account == null || temp.Step == null || temp.Password == null)
                     continue;
-                if (RecordHelper.GetInstence().CheckRecord(accountModels[i].Account, accountModels[i].Step ?? 18001))
+                //步数加上当前的号数，避免每天一样，支付宝不刷新
+                var step = (temp.Step ?? 18001) + now.Day;
+                if (RecordHelper.GetInstence().CheckRecord(temp.Account ?? "", step, now))
                 {
-                    var result = await new ChangeStepHelper().Start(accountModels[i].Account, accountModels[i].Password, accountModels[i].Step ?? 18001);
+                    var result = await new ChangeStepHelper().Start(temp.Account ?? "", temp.Password ?? "", step);
                     if (result)
                     {
-                        LogsHelper.Info("账号:" + accountModels[i].Account + "自动执行成功");
+                        LogsHelper.Info("账号:" + temp.Account + "自动执行成功(ps:步数=设置步数+当前几号)，步数：" + step);
+                        await Task.Delay(new TimeSpan(0, 2, 0));//2分钟执行一个账号
                     }
                     else
                     {
-                        LogsHelper.Error("账号:" + accountModels[i].Account + "自动执行失败");
+                        LogsHelper.Error("账号:" + temp.Account + "自动执行失败");
+                        await Task.Delay(new TimeSpan(0,2, 0));//2分钟执行一个账号
                     }
                 }
             }
+            
         }
         /// <summary>
         /// 初始化
@@ -65,11 +80,7 @@ namespace xiaomistep.HelperFiles
             {
                 while (true)
                 {
-                    //每天五点钟之后执行自动刷步数
-                    if (TimeHelper.DateTimeNow.Hour > 5)
-                    {
-                        Do();
-                    }
+                    await Do();
                     await Task.Delay(new TimeSpan(0, 30, 0));
                 }
             });
@@ -101,31 +112,27 @@ namespace xiaomistep.HelperFiles
         /// <returns></returns>
         public async Task<string> AddAcc(string acc, string pwd, int step)
         {
+            var now = await TimeHelper.GetNTPPDateTimeNow();
             bool isEmail = false;
             if (acc.Contains("@"))
             {
                 isEmail = true;
             }
-            var accountModel = accountModels.FirstOrDefault(m => m.Account == acc);
-            if (accountModel != null && accountModel.Step >= step)
-            {
-                LogsHelper.Error("账号:" + acc + "添加失败，该账号已存在并且新的步数小于之前的");
-                return "账号已存在并且步数小于之前的";
-            }
-            else if (accountModel != null && accountModel.Step < step)
+            var accountModel = accountModels.FirstOrDefault(m => m.Account == acc&&pwd==m.Password);
+            if (accountModel != null)
             {
                 accountModel.Step = step;
                 System.IO.File.WriteAllText(filePath, JsonConvert.SerializeObject(accountModels));
                 LogsHelper.Info("账号:" + acc + "步数更新成功");
                 return "账号:" + acc + "步数更新成功";
             }
-            if(string.IsNullOrEmpty(await ChangeStepHelper.LoginAndGetCode(acc, pwd, isEmail)))
+            if (string.IsNullOrEmpty(await ChangeStepHelper.LoginAndGetCode(acc, pwd, isEmail)))
             {
                 LogsHelper.Error("账号或者密码有误，添加失败");
                 return "账号或者密码有误，添加失败";
             }
             accountModels.Add(new AccountModel() { Account = acc, Password = pwd, Step = step });
-            Do();
+            await Do();
             LogsHelper.Info("账号:" + acc + "添加成功");
             System.IO.File.WriteAllText(filePath, JsonConvert.SerializeObject(accountModels));
             return "账号:" + acc + "添加成功";
@@ -135,10 +142,10 @@ namespace xiaomistep.HelperFiles
         /// </summary>
         /// <param name="acc"></param>
         /// <returns></returns>
-        public string DelAcc(string acc,string pwd)
+        public string DelAcc(string acc, string pwd)
         {
             var accountModel = accountModels.FirstOrDefault(m => m.Account == acc);
-            if(accountModel != null)
+            if (accountModel != null)
             {
                 if (accountModel.Password != pwd)
                 {
@@ -155,7 +162,12 @@ namespace xiaomistep.HelperFiles
 
         public IList<string> GetAllAcc()
         {
-            return accountModels.Select(m => m.Account??string.Empty).ToList();
+            List<string> acc = new List<string>();
+            foreach (var item in accountModels)
+            {
+                acc.Add("账号：" + item.Account + "---步数：" + item.Step);
+            }
+            return acc;
         }
     }
 }

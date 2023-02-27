@@ -9,15 +9,19 @@ namespace xiaomistep.Controllers
     public class LogsController : ControllerBase
     {
         [HttpGet]
-        public string GetTodayLogs()
+        public async Task<string> GetTodayLogs()
         {
             string str = string.Empty;
-            var logs=LogsHelper.GetTodayLog();
+            var logs=await LogsHelper.GetTodayLog();
             if (logs != null)
             {
                 foreach (var item in logs)
                 {
-                    str += "时间" + item.Time.Value.ToString("G") + "---内容:" + item.Message + "\n";
+                    if(item != null && item.Time != null)
+                    {
+                        str += "时间" + item.Time.Value.ToString("G") + "---内容:" + item.Message + "\n";
+                    }
+                    
                 }
             }
             if(string.IsNullOrEmpty(str))
@@ -36,7 +40,8 @@ namespace xiaomistep.Controllers
             {
                 foreach (var item in logs)
                 {
-                    str += "时间" + item.Time.Value.ToString("G") + "---内容:" + item.Message + "\n";
+                    if (item != null && item.Time != null)
+                        str += "时间" + item.Time.Value.ToString("G") + "---内容:" + item.Message + "\n";
                 }
             }
             if (string.IsNullOrEmpty(str))
@@ -54,7 +59,8 @@ namespace xiaomistep.Controllers
             {
                 foreach (var item in logs)
                 {
-                    str += "时间" + item.Time.Value.ToString("G") + "---内容:" + item.Message + "\n";
+                    if (item != null && item.Time != null)
+                        str += "时间" + item.Time.Value.ToString("G") + "---内容:" + item.Message + "\n";
                 }
             }
             if (string.IsNullOrEmpty(str))
@@ -65,15 +71,16 @@ namespace xiaomistep.Controllers
         }
 
         [HttpGet("GetTodayErrorLogs")]
-        public string GetTodayErrorLogs()
+        public async Task<string> GetTodayErrorLogs()
         {
             string str = string.Empty;
-            var logs = LogsHelper.GetTodayErrorLog();
+            var logs =await LogsHelper.GetTodayErrorLog();
             if (logs != null)
             {
                 foreach (var item in logs)
                 {
-                    str += "时间" + item.Time.Value.ToString("G") + "---内容:" + item.Message + "\n";
+                    if (item != null && item.Time != null)
+                        str += "时间" + item.Time.Value.ToString("G") + "---内容:" + item.Message + "\n";
                 }
             }
             if (string.IsNullOrEmpty(str))

@@ -22,14 +22,15 @@ namespace xiaomistep.Controllers
             {
                 return "步数错误";
             }
-            if (!RecordHelper.GetInstence().CheckRecord(acc, ste))
+            var now =await TimeHelper.GetNTPPDateTimeNow();
+            if (!RecordHelper.GetInstence().CheckRecord(acc, ste, now))
             {
                 return "步数必须大于上一次";
             }
             var result = await helper.Start(acc, pwd, ste);
             if (result)
             {
-                LogsHelper.Info("账号:" + acc + "执行成功");
+                LogsHelper.Info("账号:" + acc + "执行成功,执行步数为："+ ste);
                 return "执行成功";
             }
             LogsHelper.Error("账号:" + acc + "执行失败");
