@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+using System.Runtime.CompilerServices;
 using System.Runtime.Intrinsics.X86;
 using System.Security.Principal;
 using xiaomistep.Models;
@@ -22,6 +23,9 @@ namespace xiaomistep.HelperFiles
 
         private static List<AccountModel> accountModels = new List<AccountModel>();//账号信息
 
+        private static bool isDoing = false;
+
+
         private AutoHelper()
         {
 
@@ -31,9 +35,10 @@ namespace xiaomistep.HelperFiles
         /// </summary>
         private async Task Do()
         {
+            isDoing = true;
             DateTime now = await TimeHelper.GetNTPPDateTimeNow();
-            //每天十二点钟之后执行自动刷步数
-            if (now.Hour < 12 )
+            //每天九点钟之后执行自动刷步数
+            if (now.Hour < 9 )
             {
                 return;
             }
@@ -41,6 +46,7 @@ namespace xiaomistep.HelperFiles
             
             while (tempModels.Count > 0)
             {
+                now = await TimeHelper.GetNTPPDateTimeNow();
                 var temp = tempModels[0];
                 tempModels.RemoveAt(0);
                 if (temp == null || temp.Account == null || temp.Step == null || temp.Password == null)
@@ -62,7 +68,7 @@ namespace xiaomistep.HelperFiles
                     }
                 }
             }
-            
+            isDoing = false;
         }
         /// <summary>
         /// 初始化
@@ -80,7 +86,10 @@ namespace xiaomistep.HelperFiles
             {
                 while (true)
                 {
-                    await Do();
+                    if(isDoing==false)
+                    {
+                        await Do();
+                    }
                     await Task.Delay(new TimeSpan(0, 30, 0));
                 }
             });
@@ -132,9 +141,12 @@ namespace xiaomistep.HelperFiles
                 return "账号或者密码有误，添加失败";
             }
             accountModels.Add(new AccountModel() { Account = acc, Password = pwd, Step = step });
-            await Do();
             LogsHelper.Info("账号:" + acc + "添加成功");
             System.IO.File.WriteAllText(filePath, JsonConvert.SerializeObject(accountModels));
+            if (isDoing == false)
+            {
+                await Do();
+            }
             return "账号:" + acc + "添加成功";
         }
         /// <summary>
