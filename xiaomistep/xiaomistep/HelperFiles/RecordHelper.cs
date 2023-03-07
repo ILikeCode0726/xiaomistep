@@ -52,7 +52,7 @@ namespace xiaomistep.HelperFiles
                     {
                         if (item.Time.HasValue)
                         {
-                            if (item.Time.Value.ToUniversalTime().Ticks <(await TimeHelper.GetNTPDateNow()).ToUniversalTime().Ticks)
+                            if (item.Time.Value.ToUniversalTime().Ticks <(PlayNugetPackage.TimeHelper.Now.Date).ToUniversalTime().Ticks)
                             {
                                 rTemp.Add(item);
                             }
@@ -124,9 +124,9 @@ namespace xiaomistep.HelperFiles
         /// </summary>
         /// <param name="acc">账号</param>
         /// <param name="step">步数</param>
-        public async void AddRecord(string acc, int step)
+        public void AddRecord(string acc, int step)
         {
-            DateTime time = (await TimeHelper.GetNTPPDateTimeNow());
+            DateTime time = PlayNugetPackage.TimeHelper.Now;
 
             var firstR = records.Where(m => m.Account == acc).MaxBy(m => m.Time);//最新的记录
             if (firstR == null)

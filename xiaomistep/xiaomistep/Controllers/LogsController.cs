@@ -9,10 +9,10 @@ namespace xiaomistep.Controllers
     public class LogsController : ControllerBase
     {
         [HttpGet]
-        public async Task<string> GetTodayLogs()
+        public string GetTodayLogs()
         {
             string str = string.Empty;
-            var logs=await LogsHelper.GetTodayLog();
+            var logs= LogsHelper.GetTodayLog();
             if (logs != null)
             {
                 foreach (var item in logs)
@@ -71,10 +71,10 @@ namespace xiaomistep.Controllers
         }
 
         [HttpGet("GetTodayErrorLogs")]
-        public async Task<string> GetTodayErrorLogs()
+        public string GetTodayErrorLogs()
         {
             string str = string.Empty;
-            var logs =await LogsHelper.GetTodayErrorLog();
+            var logs = LogsHelper.GetTodayErrorLog();
             if (logs != null)
             {
                 foreach (var item in logs)

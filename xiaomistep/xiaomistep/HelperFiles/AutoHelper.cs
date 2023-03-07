@@ -23,7 +23,6 @@ namespace xiaomistep.HelperFiles
 
         private static List<AccountModel> accountModels = new List<AccountModel>();//账号信息
 
-        private static bool isDoing = false;
 
 
         private AutoHelper()
@@ -35,8 +34,7 @@ namespace xiaomistep.HelperFiles
         /// </summary>
         private async Task Do()
         {
-            isDoing = true;
-            DateTime now = await TimeHelper.GetNTPPDateTimeNow();
+            DateTime now = PlayNugetPackage.TimeHelper.Now;
             //每天九点钟之后执行自动刷步数
             if (now.Hour < 9 )
             {
@@ -46,7 +44,7 @@ namespace xiaomistep.HelperFiles
             
             while (tempModels.Count > 0)
             {
-                now = await TimeHelper.GetNTPPDateTimeNow();
+                now = PlayNugetPackage.TimeHelper.Now;
                 var temp = tempModels[0];
                 tempModels.RemoveAt(0);
                 if (temp == null || temp.Account == null || temp.Step == null || temp.Password == null)
@@ -68,7 +66,6 @@ namespace xiaomistep.HelperFiles
                     }
                 }
             }
-            isDoing = false;
         }
         /// <summary>
         /// 初始化
@@ -86,11 +83,8 @@ namespace xiaomistep.HelperFiles
             {
                 while (true)
                 {
-                    if(isDoing==false)
-                    {
-                        await Do();
-                    }
-                    await Task.Delay(new TimeSpan(0, 30, 0));
+                    await Do();
+                    await Task.Delay(new TimeSpan(1, 0, 0));
                 }
             });
         }
@@ -121,7 +115,7 @@ namespace xiaomistep.HelperFiles
         /// <returns></returns>
         public async Task<string> AddAcc(string acc, string pwd, int step)
         {
-            var now = await TimeHelper.GetNTPPDateTimeNow();
+            var now = PlayNugetPackage.TimeHelper.Now;
             bool isEmail = false;
             if (acc.Contains("@"))
             {
@@ -143,10 +137,20 @@ namespace xiaomistep.HelperFiles
             accountModels.Add(new AccountModel() { Account = acc, Password = pwd, Step = step });
             LogsHelper.Info("账号:" + acc + "添加成功");
             System.IO.File.WriteAllText(filePath, JsonConvert.SerializeObject(accountModels));
-            if (isDoing == false)
+
+            if (RecordHelper.GetInstence().CheckRecord(acc, step, now))
             {
-                await Do();
+                var result = await new ChangeStepHelper().Start(acc, pwd, step);
+                if (result)
+                {
+                    LogsHelper.Info("账号:" + acc + "执行成功(ps:步数=设置步数+当前几号)，步数：" + step);
+                }
+                else
+                {
+                    LogsHelper.Error("账号:" + acc + "执行失败");
+                }
             }
+
             return "账号:" + acc + "添加成功";
         }
         /// <summary>

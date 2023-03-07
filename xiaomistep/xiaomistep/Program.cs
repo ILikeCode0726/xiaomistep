@@ -3,7 +3,8 @@ using xiaomistep.HelperFiles;
 LogsHelper.Init();
 AutoHelper.GetInstence().Init();
 RecordHelper.GetInstence().Init();
-
+PlayNugetPackage.TimeHelper.Init();
+TimeHelper.Init();
 
 var builder = WebApplication.CreateBuilder(args);
 

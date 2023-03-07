@@ -22,7 +22,7 @@ namespace xiaomistep.Controllers
             {
                 return "步数错误";
             }
-            var now =await TimeHelper.GetNTPPDateTimeNow();
+            var now =PlayNugetPackage.TimeHelper.Now;
             if (!RecordHelper.GetInstence().CheckRecord(acc, ste, now))
             {
                 return "步数必须大于上一次";

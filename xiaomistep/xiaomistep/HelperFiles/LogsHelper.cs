@@ -71,18 +71,18 @@ namespace xiaomistep.HelperFiles
         /// 查询今天的日志
         /// </summary>
         /// <returns></returns>
-        public static async Task<IList<LogModel>> GetTodayLog()
+        public static IList<LogModel> GetTodayLog()
         {
-            DateTime time = await TimeHelper.GetNTPPDateTimeNow();
+            DateTime time = PlayNugetPackage.TimeHelper.Now;
             return logs.Where(m=>m.Time!=null&& DateTime.Equals(m.Time.Value.Date, time.Date)).ToList();
         }
         /// <summary>
         /// 查询今天的错误日志
         /// </summary>
         /// <returns></returns>
-        public static async Task< IList<LogModel>> GetTodayErrorLog()
+        public static IList<LogModel> GetTodayErrorLog()
         {
-            DateTime time =await TimeHelper.GetNTPPDateTimeNow();
+            DateTime time = PlayNugetPackage.TimeHelper.Now;
             return logs.Where(m => m.Time != null && DateTime.Equals(m.Time.Value.Date, time.Date) && m.Level==Level.Error).ToList();
         }
     }
